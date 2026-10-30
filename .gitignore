@@ -1,0 +1,34 @@
+# ---------------------------------------------------------------
+# Keep data out of the repository: code only.
+# The data can be rebuilt with collect_data.py (see README).
+# ---------------------------------------------------------------
+
+# Elite Prospects player files (their data; not ours to redistribute)
+CHL_Data/WHL/
+CHL_Data/OHL/
+CHL_Data/QMJHL/
+
+# Downloads, database exports, reports and charts
+CHL_Data_Full/
+
+# Any spreadsheets, wherever they are (incl. personal planning notes)
+*.xlsx
+*.xls
+*.csv
+~$*
+
+# Python / editor clutter
+__pycache__/
+*.pyc
+.venv/
+venv/
+myenv/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Never commit passwords or local settings
+.env
+*.env
+Claude outputs/

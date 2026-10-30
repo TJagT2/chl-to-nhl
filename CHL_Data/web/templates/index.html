@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero">
+  <h1>How much of his team's offence did he drive?</h1>
+  <p class="lede">Search {{ total|num }} CHL players from 1985-86 to 2015-16. See each season's share of
+    team scoring, his percentile among forwards, where he was drafted, and what he did in the NHL.</p>
+  <div class="search-wrap big">
+    <input id="search-big" type="search" placeholder="Type a player's name, e.g. Spezza" autocomplete="off"
+           aria-label="Search players" autofocus>
+    <ul id="search-big-results" class="results" role="listbox"></ul>
+  </div>
+</section>
+
+<section>
+  <h2>Top CHL scorers who reached the NHL</h2>
+  <div class="cards">
+    {% for p in stars %}
+    <a class="card" href="{{ url_for('player', player_id=p.player_id) }}">
+      <span class="card-name">{{ p.full_name.split(' [')[0] }}</span>
+      <span class="muted">{{ p.leagues }} · {{ p.first_year|int }}-{{ ((p.last_year|int + 1)|string)[-2:] }}</span>
+      <span class="card-stat">{{ p.points|num }} <small>CHL pts in top-100 seasons</small></span>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}<script>attachSearch("search-big", "search-big-results");</script>{% endblock %}

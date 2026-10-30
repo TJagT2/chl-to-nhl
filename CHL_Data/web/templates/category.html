@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} · CHL Prospect Explorer{% endblock %}
+{% block content %}
+<p><a href="{{ url_for('draft') }}">← Draft</a></p>
+<h1>{{ title }}</h1>
+<p class="lede">{{ summary.players|num }} late-round CHL forwards. Their NHL careers averaged
+  <strong>{{ summary.avg_gp|num }} games</strong> against {{ summary.expected_gp|num }} expected for their draft
+  slots ({{ summary.gp_vs_expected|num(2) }}x), and {{ summary.avg_points|num }} points against
+  {{ summary.expected_points|num }} expected.</p>
+
+<div class="table-wrap">
+<table class="sortable">
+  <thead><tr>
+    <th>Player</th><th class="num">Draft</th><th class="num">Pick</th><th class="num">Decile</th>
+    <th>CHL team</th><th class="num">Height</th><th class="num">GP</th><th class="num">G</th>
+    <th class="num">PTS</th><th class="num">Goal share</th><th class="num">Point share</th>
+    <th class="num">NHL GP</th><th class="num">Expected GP</th><th class="num">NHL PTS</th>
+  </tr></thead>
+  <tbody>
+  {% for r in rows %}
+    <tr>
+      <td>{% if r.player_id %}<a href="{{ url_for('player', player_id=r.player_id|int) }}">{{ r.player }}</a>
+          {% else %}{{ r.player }}{% endif %}</td>
+      <td class="num">{{ r.draft_year }}</td><td class="num">{{ r.overall_pick }}</td>
+      <td class="num">{{ r.draft_decile }}</td><td>{{ r.team }} ({{ r.league }})</td>
+      <td class="num" data-sort="{{ r.height_in }}">{% if r.height_in %}{{ (r.height_in // 12)|int }}'{{ (r.height_in % 12)|int }}"{% else %}–{% endif %}</td>
+      <td class="num">{{ r.gp|num }}</td><td class="num">{{ r.goals|num }}</td><td class="num">{{ r.points|num }}</td>
+      <td class="num" data-sort="{{ r.goal_share }}">{{ r.goal_share|pct }}</td>
+      <td class="num" data-sort="{{ r.point_share }}">{{ r.point_share|pct }}</td>
+      <td class="num"><strong>{{ r.nhl_gp|num }}</strong></td>
+      <td class="num">{{ r.exp_nhl_gp|num }}</td><td class="num">{{ r.nhl_points|num }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}

@@ -1,0 +1,142 @@
+/* CHL Prospect Explorer - light and dark themes from the same tokens */
+:root {
+  --surface: #fcfcfb;
+  --surface-2: #f3f2ef;
+  --border: #e4e3df;
+  --text: #0b0b0b;
+  --text-2: #52514e;
+  --accent: #2a78d6;
+  --accent-ink: #1c5cab;
+  --good: #0ca30c;
+  --serious: #c2571f;
+  --row-hover: #eef4fc;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --surface: #1a1a19;
+    --surface-2: #242422;
+    --border: #383835;
+    --text: #f0efec;
+    --text-2: #c3c2b7;
+    --accent: #3987e5;
+    --accent-ink: #86b6ef;
+    --good: #3ec43e;
+    --serious: #ec835a;
+    --row-hover: #20293a;
+    color-scheme: dark;
+  }
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: var(--surface);
+  color: var(--text);
+}
+a { color: var(--accent-ink); text-decoration: none; }
+a:hover { text-decoration: underline; }
+main { max-width: 1180px; margin: 0 auto; padding: 24px 16px 48px; }
+h1 { font-size: 28px; line-height: 1.2; margin: 8px 0 6px; }
+h2 { font-size: 18px; margin: 32px 0 10px; }
+.lede { color: var(--text-2); max-width: 760px; margin-top: 0; }
+.muted { color: var(--text-2); }
+.small { font-size: 13px; }
+footer { color: var(--text-2); font-size: 12px; text-align: center; padding: 24px 16px; border-top: 1px solid var(--border); }
+
+/* Top bar */
+.topbar {
+  display: flex; align-items: center; gap: 24px; flex-wrap: wrap;
+  padding: 10px 16px; border-bottom: 1px solid var(--border); background: var(--surface-2);
+}
+.brand { font-weight: 700; color: var(--text); }
+.topbar nav { display: flex; gap: 4px; }
+.topbar nav a { color: var(--text-2); padding: 6px 10px; border-radius: 6px; }
+.topbar nav a.active, .topbar nav a:hover { background: var(--surface); color: var(--text); text-decoration: none; }
+.topbar .search-wrap { margin-left: auto; }
+
+/* Search */
+.search-wrap { position: relative; }
+.search-wrap input {
+  width: 260px; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border);
+  background: var(--surface); color: var(--text); font: inherit;
+}
+.search-wrap.big input { width: min(560px, 100%); padding: 14px 16px; font-size: 18px; }
+.search-wrap.big { margin: 20px 0 8px; }
+.results {
+  position: absolute; z-index: 10; left: 0; right: 0; top: calc(100% + 4px); min-width: 300px;
+  margin: 0; padding: 4px; list-style: none; background: var(--surface);
+  border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,.12);
+}
+.results:empty { display: none; }
+.search-wrap.big .results { max-width: 560px; }
+.results li a {
+  display: flex; justify-content: space-between; gap: 12px; padding: 8px 10px; border-radius: 6px; color: var(--text);
+}
+.results li a:hover, .results li a.focus { background: var(--row-hover); text-decoration: none; }
+.results .tag { font-size: 12px; color: var(--text-2); white-space: nowrap; }
+
+/* Cards and tiles */
+.hero { padding: 16px 0 8px; }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+.card {
+  display: flex; flex-direction: column; gap: 2px; padding: 14px; border: 1px solid var(--border);
+  border-radius: 10px; color: var(--text); background: var(--surface);
+}
+.card:hover { border-color: var(--accent); text-decoration: none; }
+.card-name { font-weight: 600; }
+.card-stat { font-size: 20px; font-weight: 600; margin-top: 6px; }
+.card-stat small { font-size: 12px; font-weight: 400; color: var(--text-2); }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin: 20px 0; }
+.tile { display: flex; flex-direction: column; gap: 2px; padding: 16px; border-radius: 10px; background: var(--surface-2); }
+.tile-label { font-size: 13px; color: var(--text-2); }
+.tile-value { font-size: 28px; font-weight: 700; }
+.tile-value small { font-size: 14px; font-weight: 500; color: var(--text-2); }
+
+/* Tables */
+.table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 10px; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th, td { padding: 8px 10px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+th { background: var(--surface-2); font-weight: 600; font-size: 13px; color: var(--text-2); position: sticky; top: 0; }
+th.num, td.num { text-align: right; font-variant-numeric: tabular-nums; }
+tbody tr:hover { background: var(--row-hover); }
+tbody tr:last-child td { border-bottom: 0; }
+table.sortable th { cursor: pointer; user-select: none; }
+table.sortable th[aria-sort="ascending"]::after { content: " ▲"; font-size: 10px; }
+table.sortable th[aria-sort="descending"]::after { content: " ▼"; font-size: 10px; }
+tr.subtotal td { color: var(--text-2); background: var(--surface-2); }
+.ratio.up { color: var(--good); font-weight: 600; }
+.ratio.down { color: var(--serious); }
+
+/* Filters */
+.filters { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; margin: 16px 0; }
+.filters label { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--text-2); }
+.filters select, .filters input, .filters button {
+  font: inherit; padding: 7px 10px; border: 1px solid var(--border); border-radius: 8px;
+  background: var(--surface); color: var(--text);
+}
+.filters input { width: 90px; }
+.filters button { background: var(--accent); border-color: var(--accent); color: #fff; cursor: pointer; }
+
+/* Charts (drawn by app.js) */
+.chart { position: relative; width: 100%; margin-bottom: 16px; }
+.chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+.chart .bar { fill: var(--accent); }
+.chart .bar:hover, .chart .bar.hot { fill: var(--accent-ink); }
+.chart .axis text { fill: var(--text-2); font-size: 11px; }
+.chart .grid line { stroke: var(--border); }
+.chart .value { fill: var(--text); font-size: 11px; }
+.chart .title { fill: var(--text-2); font-size: 12px; }
+.tooltip {
+  position: absolute; pointer-events: none; padding: 6px 10px; border-radius: 6px; font-size: 13px;
+  background: var(--text); color: var(--surface); white-space: nowrap; transform: translate(-50%, -110%);
+  opacity: 0; transition: opacity .1s;
+}
+.tooltip.show { opacity: 1; }
+
+@media (max-width: 640px) {
+  .topbar .search-wrap { margin-left: 0; width: 100%; }
+  .search-wrap input { width: 100%; }
+  h1 { font-size: 24px; }
+}

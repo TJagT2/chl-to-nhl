@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Leaders · CHL Prospect Explorer{% endblock %}
+{% block content %}
+<h1>Single-season leaders</h1>
+<p class="lede">The top 100 seasons by share of team scoring. Shares count the team's goals in the games the
+  player played, so they compare fairly across eras and team strength.</p>
+
+<form class="filters" method="get">
+  <label>Measure
+    <select name="metric">
+      {% for key, label in metrics.items() %}
+      <option value="{{ key }}" {{ 'selected' if f.metric == key }}>{{ label }}</option>
+      {% endfor %}
+    </select>
+  </label>
+  <label>League
+    <select name="league">
+      <option value="all">All leagues</option>
+      {% for lg in leagues %}<option {{ 'selected' if f.league == lg }}>{{ lg }}</option>{% endfor %}
+    </select>
+  </label>
+  <label>Season
+    <select name="season">
+      <option value="all">All seasons</option>
+      {% for s in seasons %}<option {{ 'selected' if f.season == s }}>{{ s }}</option>{% endfor %}
+    </select>
+  </label>
+  <label>Position
+    <select name="position">
+      <option value="F" {{ 'selected' if f.position == 'F' }}>Forwards</option>
+      <option value="D" {{ 'selected' if f.position == 'D' }}>Defencemen</option>
+      <option value="all" {{ 'selected' if f.position == 'all' }}>All</option>
+    </select>
+  </label>
+  <label>Min. games
+    <input type="number" name="min_gp" value="{{ f.min_gp }}" min="0" max="80">
+  </label>
+  <button type="submit">Apply</button>
+</form>
+
+<div class="table-wrap">
+<table class="sortable">
+  <thead><tr>
+    <th class="num">#</th><th>Player</th><th>Season</th><th>League</th><th>Team</th>
+    <th class="num">GP</th><th class="num">PTS</th><th class="num">P/GP</th>
+    <th class="num">Goal share</th><th class="num">Assist share</th><th class="num">Point share</th>
+    <th class="num">Pctile</th><th class="num">NHL GP</th><th class="num">NHL PTS</th>
+  </tr></thead>
+  <tbody>
+  {% for r in rows %}
+    <tr>
+      <td class="num">{{ loop.index }}</td>
+      <td><a href="{{ url_for('player', player_id=r.player_id) }}">{{ r.full_name }}</a></td>
+      <td>{{ r.season }}</td><td>{{ r.league }}</td><td>{{ r.teams }}</td>
+      <td class="num">{{ r.gp|num }}</td><td class="num">{{ r.points|num }}</td>
+      <td class="num">{{ r.points_per_game|num(2) }}</td>
+      <td class="num" data-sort="{{ r.goal_share_gp_adj }}">{{ r.goal_share_gp_adj|pct }}</td>
+      <td class="num" data-sort="{{ r.assist_share_gp_adj }}">{{ r.assist_share_gp_adj|pct }}</td>
+      <td class="num" data-sort="{{ r.point_share_gp_adj }}">{{ r.point_share_gp_adj|pct }}</td>
+      <td class="num" data-sort="{{ r.pctile }}">{{ ((r.pctile or 0) * 100)|round|int if r.pctile is not none else '–' }}</td>
+      <td class="num">{{ r.nhl_gp|num if r.nhl_gp is not none else '0' }}</td>
+      <td class="num">{{ r.nhl_points|num if r.nhl_points is not none else '0' }}</td>
+    </tr>
+  {% else %}
+    <tr><td colspan="14" class="muted">No seasons match these filters.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+<p class="muted small">Percentile is among forwards in the same league season when viewing forwards, and among
+  all top-100 scorers otherwise. Click a column heading to sort.</p>
+{% endblock %}

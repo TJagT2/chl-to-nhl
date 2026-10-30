@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} · CHL Prospect Explorer{% endblock %}
+{% block content %}
+<h1>{{ title }}</h1>
+<p class="lede">{{ message }}</p>
+<p><a href="{{ url_for('home') }}">Back to search</a></p>
+{% endblock %}

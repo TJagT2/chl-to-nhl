@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}{{ name }} · CHL Prospect Explorer{% endblock %}
+{% block content %}
+<h1>{{ name }}</h1>
+{% set last = seasons[-1] if seasons else None %}
+<p class="lede">
+  {% if seasons %}{{ seasons|map(attribute='league')|unique|join(' / ') }} ·
+  {{ seasons[0].season }} to {{ last.season }} ·
+  {{ last.position or '' }}{% endif %}
+</p>
+
+<div class="tiles">
+  {% set best = seasons|selectattr('point_share_gp_adj')|max(attribute='point_share_gp_adj') if seasons else None %}
+  <div class="tile">
+    <span class="tile-label">Best team point share</span>
+    <span class="tile-value">{{ best.point_share_gp_adj|pct if best else '–' }}</span>
+    <span class="muted">{{ best.season if best else '' }} · in on that share of his team's goals</span>
+  </div>
+  {% set top_pct = seasons|selectattr('fwd_pctile')|max(attribute='fwd_pctile') if seasons else None %}
+  <div class="tile">
+    <span class="tile-label">Best percentile among forwards</span>
+    <span class="tile-value">{{ (top_pct.fwd_pctile * 100)|round|int if top_pct else '–' }}{{ 'th' if top_pct }}</span>
+    <span class="muted">within his league season (top-100 scorers)</span>
+  </div>
+  <div class="tile">
+    <span class="tile-label">NHL career</span>
+    {% if nhl %}
+      {% for n in nhl %}
+      <span class="tile-value">{{ n.nhl_gp|num }} <small>GP</small> · {{ n.nhl_points|num }} <small>PTS</small></span>
+      <span class="muted">{{ n.nhl_goals|num }} G, {{ n.nhl_assists|num }} A{{ ' · Hall of Fame' if n.hall_of_fame }}</span>
+      {% endfor %}
+    {% else %}
+      <span class="tile-value">0 <small>GP</small></span>
+      <span class="muted">no NHL games found (1986-87 to 2025-26)</span>
+    {% endif %}
+  </div>
+</div>
+
+{% if picks %}
+<section>
+  <h2>NHL draft</h2>
+  {% for d in picks %}
+  <p>
+    <strong>{{ d.draft_year }}</strong>, round {{ d.round }}, pick {{ d.overall_pick }} overall by
+    {{ d.drafted_by }} (draft decile {{ d.draft_decile }}){% if d.height_in %}, listed at
+    {{ d.height_in // 12 }}'{{ d.height_in % 12 }}"{% endif %}.
+    {% if d.expected_gp %}
+    Forwards taken in that decile averaged <strong>{{ d.expected_gp|num }} NHL games</strong> and
+    {{ d.expected_points|num }} points; he played <strong>{{ d.actual_gp|num }}</strong>
+    ({{ (d.actual_gp / d.expected_gp)|num(1) }}x expected).
+    {% endif %}
+  </p>
+  {% endfor %}
+</section>
+{% endif %}
+
+<section>
+  <h2>Share of team goals he was in on, by season</h2>
+  <div id="share-chart" class="chart" role="img"
+       aria-label="Bar chart of team point share by season; the same numbers are in the table below"></div>
+</section>
+
+<section>
+  <h2>CHL seasons</h2>
+  <p class="muted small">Only seasons in which he was one of his league's top-100 scorers. Shares count the
+    team's goals in the games he played. Percentile ranks him against forwards in the same league season.</p>
+  <div class="table-wrap">
+  <table class="sortable">
+    <thead><tr>
+      <th>Season</th><th>League</th><th>Team</th><th class="num">GP</th><th class="num">G</th>
+      <th class="num">A</th><th class="num">PTS</th><th class="num">P/GP</th>
+      <th class="num">Goal share</th><th class="num">Assist share</th><th class="num">Point share</th>
+      <th class="num">Team rank</th><th class="num">Fwd pctile</th><th class="num">Playoff PTS</th>
+    </tr></thead>
+    <tbody>
+    {% for s in seasons %}
+      <tr>
+        <td>{{ s.season }}</td><td>{{ s.league }}</td><td>{{ s.teams }}</td>
+        <td class="num">{{ s.gp|num }}</td><td class="num">{{ s.goals|num }}</td>
+        <td class="num">{{ s.assists|num }}</td><td class="num">{{ s.points|num }}</td>
+        <td class="num">{{ s.points_per_game|num(2) }}</td>
+        <td class="num" data-sort="{{ s.goal_share_gp_adj }}">{{ s.goal_share_gp_adj|pct }}</td>
+        <td class="num" data-sort="{{ s.assist_share_gp_adj }}">{{ s.assist_share_gp_adj|pct }}</td>
+        <td class="num" data-sort="{{ s.point_share_gp_adj }}"><strong>{{ s.point_share_gp_adj|pct }}</strong></td>
+        <td class="num">{{ s.best_team_scoring_rank|num }}</td>
+        <td class="num" data-sort="{{ s.fwd_pctile }}">{{ ((s.fwd_pctile or 0) * 100)|round|int if s.fwd_pctile is not none else '–' }}</td>
+        <td class="num">{{ s.playoff_points|num }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+  barChart("share-chart", {{ chart|tojson }}, {
+    format: v => (v * 100).toFixed(1) + "%",
+    tooltip: d => `${d.label} (${d.league}): ${(d.value * 100).toFixed(1)}% of team goals · ${d.points} pts in ${d.gp} GP`
+  });
+</script>
+{% endblock %}

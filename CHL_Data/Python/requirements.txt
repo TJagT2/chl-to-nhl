@@ -1,0 +1,9 @@
+openpyxl
+psycopg[binary]
+requests
+lxml
+pandas
+numpy
+scipy
+matplotlib
+flask

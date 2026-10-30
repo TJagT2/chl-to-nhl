@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Draft · CHL Prospect Explorer{% endblock %}
+{% block content %}
+<h1>What forwards drafted in each slot became</h1>
+<p class="lede">Every NHL draft from 1986 to 2016, split into ten equal groups by overall pick. Averages are for
+  forwards taken in each group; picks who never played count as 0.</p>
+
+<section>
+  <div id="decile-chart" class="chart" role="img"
+       aria-label="Average NHL games per forward pick by draft decile; numbers in the table below"></div>
+  <div class="table-wrap">
+  <table class="sortable">
+    <thead><tr>
+      <th class="num">Decile</th><th class="num">Forward picks</th><th class="num">Avg NHL GP</th>
+      <th class="num">Avg goals</th><th class="num">Avg assists</th><th class="num">Avg points</th>
+      <th class="num">Played in NHL</th><th class="num">200+ GP</th>
+    </tr></thead>
+    <tbody>
+    {% for d in deciles %}
+      <tr>
+        <td class="num">{{ d.draft_decile }}</td><td class="num">{{ d.picks|num }}</td>
+        <td class="num">{{ d.avg_nhl_gp|num }}</td><td class="num">{{ d.avg_nhl_goals|num }}</td>
+        <td class="num">{{ d.avg_nhl_assists|num }}</td><td class="num">{{ d.avg_nhl_points|num }}</td>
+        <td class="num" data-sort="{{ d.pct_played_nhl }}">{{ d.pct_played_nhl|pct(0) }}</td>
+        <td class="num" data-sort="{{ d.pct_200_plus_gp }}">{{ d.pct_200_plus_gp|pct(0) }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section>
+  <h2>Late-round CHL forwards: who beat their draft slot?</h2>
+  <p class="muted small">CHL forwards picked in the second half of the draft (deciles 6-10), grouped by their
+    draft-year CHL season. "vs expected" compares their NHL careers with all forwards drafted in the same decile
+    and era: 1.00x = as expected. Groups under ~30 players are anecdotal.</p>
+  <div class="table-wrap">
+  <table>
+    <thead><tr>
+      <th>Category</th><th class="num">Players</th><th class="num">Avg NHL GP</th>
+      <th class="num">Expected GP</th><th class="num">GP vs expected</th>
+      <th class="num">Avg NHL PTS</th><th class="num">PTS vs expected</th>
+    </tr></thead>
+    <tbody>
+    {% for c in categories %}
+      <tr class="{{ 'subtotal' if not c.number }}">
+        <td>{% if c.number %}<a href="{{ url_for('category', number=c.number|int) }}">{{ c.category }}</a>
+            {% else %}{{ c.category }}{% endif %}</td>
+        <td class="num">{{ c.players|num }}</td>
+        <td class="num">{{ c.avg_gp|num }}</td><td class="num">{{ c.expected_gp|num }}</td>
+        <td class="num"><span class="ratio {{ 'up' if c.gp_vs_expected and c.gp_vs_expected >= 1 else 'down' }}">
+          {{ c.gp_vs_expected|num(2) }}x</span></td>
+        <td class="num">{{ c.avg_points|num }}</td>
+        <td class="num">{{ c.points_vs_expected|num(2) }}x</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+  barChart("decile-chart", {{ deciles|map(attribute='avg_nhl_gp')|list|tojson }}.map((v, i) => ({
+      label: "D" + (i + 1), value: v })), {
+    format: v => Math.round(v),
+    tooltip: d => `Decile ${d.label.slice(1)}: ${Math.round(d.value)} NHL games per forward pick`,
+    title: "Average NHL games per forward pick"
+  });
+</script>
+{% endblock %}

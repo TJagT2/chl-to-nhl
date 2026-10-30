@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}CHL Prospect Explorer{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="{{ url_for('home') }}">CHL Prospect Explorer</a>
+    <nav>
+      <a href="{{ url_for('home') }}" class="{{ 'active' if request.endpoint == 'home' }}">Search</a>
+      <a href="{{ url_for('leaders') }}" class="{{ 'active' if request.endpoint == 'leaders' }}">Leaders</a>
+      <a href="{{ url_for('draft') }}" class="{{ 'active' if request.endpoint in ('draft', 'category') }}">Draft</a>
+    </nav>
+    <div class="search-wrap compact">
+      <input id="search" type="search" placeholder="Find a player…" autocomplete="off" aria-label="Search players">
+      <ul id="search-results" class="results" role="listbox"></ul>
+    </div>
+  </header>
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+  <footer>
+    Data: Elite Prospects top-100 CHL scorers (1985-2016), Wikipedia standings (CC BY-SA),
+    NHL stats &amp; records APIs. Regular season unless noted.
+  </footer>
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>
